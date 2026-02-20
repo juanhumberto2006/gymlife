@@ -19,10 +19,13 @@ public class GymLifeApplication {
 	@Bean
 	CommandLineRunner init(UsuarioRepository usuarioRepository, PasswordEncoder encoder) {
 		return args -> {
-			if (usuarioRepository.findByUsername("admin").isEmpty()) {
-				Usuario admin = new Usuario("admin", encoder.encode("admin123"));
-				admin.addRol(new Rol("ROLE_ADMIN"));
-				usuarioRepository.save(admin);
+			try {
+				if (usuarioRepository.findByUsername("admin").isEmpty()) {
+					Usuario admin = new Usuario("admin", encoder.encode("admin123"));
+					admin.addRol(new Rol("ROLE_ADMIN"));
+					usuarioRepository.save(admin);
+				}
+			} catch (Exception ignored) {
 			}
 		};
 	}

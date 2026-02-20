@@ -35,47 +35,59 @@ public class UserViewController {
 
     @GetMapping("/")
     public String home(Model model, Authentication auth) {
-        List<Clase> clases = claseRepository.findAll();
-        model.addAttribute("clases", clases);
+        try {
+            List<Clase> clases = claseRepository.findAll();
+            model.addAttribute("clases", clases);
 
-        Map<Long, Long> reservados = new HashMap<>();
-        for (Clase c : clases) {
-            reservados.put(c.getId(), reservaRepository.countByClaseId(c.getId()));
-        }
-        model.addAttribute("reservados", reservados);
-
-        if (auth != null && auth.isAuthenticated()) {
-            Optional<Usuario> userOpt = usuarioRepository.findByUsername(auth.getName());
-            if (userOpt.isPresent()) {
-                model.addAttribute("misReservas", reservaRepository.findByUsuario(userOpt.get()));
+            Map<Long, Long> reservados = new HashMap<>();
+            for (Clase c : clases) {
+                reservados.put(c.getId(), reservaRepository.countByClaseId(c.getId()));
             }
+            model.addAttribute("reservados", reservados);
+
+            if (auth != null && auth.isAuthenticated()) {
+                Optional<Usuario> userOpt = usuarioRepository.findByUsername(auth.getName());
+                if (userOpt.isPresent()) {
+                    model.addAttribute("misReservas", reservaRepository.findByUsuario(userOpt.get()));
+                }
+            }
+        } catch (Exception e) {
+            model.addAttribute("clases", List.of());
+            model.addAttribute("reservados", Map.of());
+            model.addAttribute("dbError", "Servicio de base de datos no disponible. Mostrando vista básica.");
         }
         return "vista usuario/index";
     }
 
     @GetMapping("/clases")
     public String verClases(Model model, Authentication auth) {
-        List<Clase> clases = claseRepository.findAll();
-        model.addAttribute("clases", clases);
+        try {
+            List<Clase> clases = claseRepository.findAll();
+            model.addAttribute("clases", clases);
 
-        Map<Long, Long> reservados = new HashMap<>();
-        for (Clase c : clases) {
-            reservados.put(c.getId(), reservaRepository.countByClaseId(c.getId()));
-        }
-        model.addAttribute("reservados", reservados);
-        
-        // Mark classes reserved by current user
-        Map<Long, Boolean> misReservasMap = new HashMap<>();
-        if (auth != null && auth.isAuthenticated()) {
-            Optional<Usuario> userOpt = usuarioRepository.findByUsername(auth.getName());
-            if (userOpt.isPresent()) {
-                Usuario usuario = userOpt.get();
-                for (Clase c : clases) {
-                    misReservasMap.put(c.getId(), reservaRepository.existsByUsuarioIdAndClaseId(usuario.getId(), c.getId()));
+            Map<Long, Long> reservados = new HashMap<>();
+            for (Clase c : clases) {
+                reservados.put(c.getId(), reservaRepository.countByClaseId(c.getId()));
+            }
+            model.addAttribute("reservados", reservados);
+            
+            Map<Long, Boolean> misReservasMap = new HashMap<>();
+            if (auth != null && auth.isAuthenticated()) {
+                Optional<Usuario> userOpt = usuarioRepository.findByUsername(auth.getName());
+                if (userOpt.isPresent()) {
+                    Usuario usuario = userOpt.get();
+                    for (Clase c : clases) {
+                        misReservasMap.put(c.getId(), reservaRepository.existsByUsuarioIdAndClaseId(usuario.getId(), c.getId()));
+                    }
                 }
             }
+            model.addAttribute("misReservasMap", misReservasMap);
+        } catch (Exception e) {
+            model.addAttribute("clases", List.of());
+            model.addAttribute("reservados", Map.of());
+            model.addAttribute("misReservasMap", Map.of());
+            model.addAttribute("dbError", "Servicio de base de datos no disponible. Mostrando vista básica.");
         }
-        model.addAttribute("misReservasMap", misReservasMap);
 
         return "vista usuario/clases";
     }
