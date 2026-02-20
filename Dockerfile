@@ -25,8 +25,11 @@ WORKDIR /app
 # Copiar el JAR generado
 COPY --from=build /app/target/*.jar app.jar
 
+# Limitar memoria de JVM para el plan Free (512MB)
+ENV JAVA_OPTS="-Xmx256m -Xms128m"
+
 # Puerto expuesto
 EXPOSE 8080
 
-# Comando de inicio
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Comando de inicio con opciones de memoria
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
