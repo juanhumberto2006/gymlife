@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>GymLife</title>
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+</head>
+<body>
+<div class="login-card">
+    <div class="login-header">Bienvenido a GymLife</div>
+    <p>Has iniciado sesión correctamente.</p>
+    <div class="actions">
+        <a class="btn-primary" th:href="@{/logout}">Cerrar sesión</a>
+    </div>
+</div>
+</body>
+</html>

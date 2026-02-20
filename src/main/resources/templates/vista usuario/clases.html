@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clases Disponibles | GymLife</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .page-header { background: #222; padding: 60px 0; text-align: center; color: white; margin-bottom: 40px; }
+        .page-title { font-size: 36px; font-weight: 900; margin: 0; text-transform: uppercase; }
+        .page-subtitle { color: #aaa; margin-top: 10px; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .classes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; margin-bottom: 60px; }
+        .class-card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: 0.3s; }
+        .class-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
+        .class-img { height: 200px; background: #333; display: flex; align-items: center; justify-content: center; color: #555; }
+        .class-body { padding: 25px; text-align: center; }
+        .class-title { font-size: 20px; font-weight: 700; margin: 0 0 10px; text-transform: uppercase; }
+        .class-meta { color: #777; font-size: 14px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a th:href="@{/}" class="navbar-brand">
+            GymLife
+            <span>Fitness Center</span>
+        </a>
+        <ul class="navbar-menu">
+            <li><a th:href="@{/}">Inicio</a></li>
+            <li><a th:href="@{/clases}" class="active">Clases</a></li>
+            <li><a th:href="@{/about}">Nosotros</a></li>
+            <li><a th:href="@{/info}">Información</a></li>
+            <li th:if="${#authorization.expression('isAuthenticated()')}"><a href="#my-reservations">Mis Reservas</a></li>
+        </ul>
+        <div class="navbar-icons">
+            <a href="#" class="icon-btn"><i class="fas fa-search"></i></a>
+            
+            <div class="user-menu" style="position:relative;display:inline-block;" th:if="${#authorization.expression('isAnonymous()')}">
+                 <a href="#" class="icon-btn" onclick="document.getElementById('auth-dropdown').classList.toggle('show');return false;">
+                    <i class="fas fa-user"></i>
+                 </a>
+                 <div id="auth-dropdown" style="display:none;position:absolute;right:0;top:30px;background:white;box-shadow:0 5px 15px rgba(0,0,0,0.1);border-radius:5px;width:150px;overflow:hidden;z-index:100;">
+                    <a th:href="@{/login}" style="display:block;padding:10px 15px;color:var(--dark);text-decoration:none;font-size:14px;border-bottom:1px solid #eee;">Iniciar Sesión</a>
+                    <a th:href="@{/register}" style="display:block;padding:10px 15px;color:var(--dark);text-decoration:none;font-size:14px;">Registrarse</a>
+                 </div>
+            </div>
+
+            <span th:if="${#authorization.expression('isAuthenticated()')}" style="font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;position:relative;">
+                <a href="#" onclick="var d=document.getElementById('user-logout-dropdown'); d.style.display = d.style.display === 'block' ? 'none' : 'block'; return false;" style="text-decoration:none;color:inherit;display:flex;align-items:center;gap:8px;">
+                    <i class="fas fa-user-circle fa-lg"></i>
+                    <span th:text="${#authentication.name}">User</span>
+                </a>
+                <div id="user-logout-dropdown" style="display:none;position:absolute;right:0;top:30px;background:white;box-shadow:0 5px 15px rgba(0,0,0,0.1);border-radius:5px;width:150px;overflow:hidden;z-index:100;">
+                    <a th:href="@{/logout}" style="display:block;padding:10px 15px;color:var(--dark);text-decoration:none;font-size:14px;">Cerrar sesión</a>
+                </div>
+            </span>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="page-header">
+        <h1 class="page-title">Clases Disponibles</h1>
+        <p class="page-subtitle">Encuentra y reserva tu próxima sesión de entrenamiento</p>
+    </header>
+
+    <div class="container">
+        <!-- Classes Grid -->
+        <div class="classes-grid">
+            <div class="class-card" th:each="clase : ${clases}">
+                <div class="class-img">
+                    <i class="fas fa-dumbbell fa-4x" style="color:#eee;opacity:0.5;"></i>
+                    <div style="position:absolute;color:white;font-weight:700;font-size:24px;text-transform:uppercase;" th:text="${#strings.substring(clase.nombre,0,1)}">C</div>
+                </div>
+                <div class="class-body">
+                    <h3 class="class-title" th:text="${clase.nombre}">Yoga</h3>
+                    <p class="class-meta">
+                        <i class="far fa-clock" style="color:var(--primary);"></i> <span th:text="${#temporals.format(clase.fechaHora, 'dd MMM, HH:mm')}">12 Feb, 10:00</span>
+                    </p>
+                    <p style="font-size:14px;color:#666;margin-bottom:20px;" th:text="${clase.descripcion}">Description goes here...</p>
+                    
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;font-size:13px;font-weight:600;color:#555;">
+                        <span><i class="fas fa-users"></i> Capacidad: <span th:text="${clase.capacidad}">20</span></span>
+                        <span>Disponible: <span th:text="${clase.capacidad - (reservados[clase.id] ?: 0)}" style="color:var(--primary);">5</span></span>
+                    </div>
+
+                    <!-- Booking Form -->
+                    <form th:action="@{/reservar}" method="post" th:if="${#authorization.expression('isAuthenticated()')}">
+                        <input type="hidden" name="claseId" th:value="${clase.id}"/>
+                        
+                        <!-- Logic for button state -->
+                        <button type="submit" class="btn-primary" 
+                                style="width:100%;"
+                                th:if="${(misReservasMap[clase.id] == false) and ((reservados[clase.id] ?: 0) < clase.capacidad)}">
+                            Reservar Ahora
+                        </button>
+                        
+                        <button type="button" class="btn-primary btn-disabled" 
+                                style="width:100%;background:#4caf50;" disabled
+                                th:if="${misReservasMap[clase.id] == true}">
+                            <i class="fas fa-check"></i> Reservado
+                        </button>
+                        
+                        <button type="button" class="btn-primary btn-disabled" 
+                                style="width:100%;" disabled
+                                th:if="${(reservados[clase.id] ?: 0) >= clase.capacidad and (misReservasMap[clase.id] == false)}">
+                            Lleno
+                        </button>
+                    </form>
+                    
+                    <a th:href="@{/login}" class="btn-primary" style="width:100%;display:block;text-align:center;" th:if="${#authorization.expression('isAnonymous()')}">Inicia sesión para reservar</a>
+                </div>
+            </div>
+        </div>
+        
+        <div th:if="${#lists.isEmpty(clases)}" style="text-align:center;padding:50px;color:#777;">
+            <i class="far fa-calendar-times fa-3x" style="margin-bottom:20px;opacity:0.5;"></i>
+            <p>No hay clases disponibles por el momento.</p>
+        </div>
+    </div>
+
+    <!-- My Reservations Section (Only for logged in users) -->
+    <section id="my-reservations" class="container" style="margin-bottom:80px;" th:if="${#authorization.expression('isAuthenticated()')}">
+        <h2 style="font-size:24px;margin-bottom:30px;border-bottom:2px solid #eee;padding-bottom:10px;">Mis Reservas</h2>
+        
+        <div style="background:white;padding:30px;border-radius:10px;text-align:center;color:#777;">
+            <p>Consulta tu historial de reservas en tu panel o página de inicio.</p>
+            <a th:href="@{/}" class="btn-primary" style="margin-top:10px;">Ir a Inicio</a>
+        </div>
+    </section>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // Dropdown Logic
+        window.onclick = function(event) {
+            if (!event.target.closest('a[onclick*="user-logout-dropdown"]')) {
+                var d = document.getElementById('user-logout-dropdown');
+                if (d && d.style.display === 'block') d.style.display = 'none';
+            }
+            if (!event.target.closest('.user-menu')) {
+                var d = document.getElementById('auth-dropdown');
+                if (d && d.style.display === 'block') d.style.display = 'none';
+            }
+        }
+
+        // SweetAlert Messages
+        var mensaje = /*[[${mensaje}]]*/ null;
+        var error = /*[[${error}]]*/ null;
+        
+        if(mensaje) {
+            Swal.fire({
+                title: '¡Éxito!',
+                text: mensaje,
+                icon: 'success',
+                confirmButtonColor: '#ff5722'
+            });
+        }
+        if(error) {
+            Swal.fire({
+                title: 'Ooops...',
+                text: error,
+                icon: 'error',
+                confirmButtonColor: '#ff5722'
+            });
+        }
+        /*]]>*/
+    </script>
+</body>
+</html>

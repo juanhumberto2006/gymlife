@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin | GymLife</title>
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+    <style>
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .tile { background:#fff; border-radius:10px; padding:16px; box-shadow:0 6px 20px rgba(0,0,0,.15); }
+        .tile h3 { margin:0 0 8px 0; color:#1667c1; }
+    </style>
+<head>
+<body>
+<div class="login-card" style="width: 800px;">
+    <div class="login-header">Panel del Administrador</div>
+    <p>Bienvenido, <span th:text="${#authentication.name}"></span></p>
+    <div class="grid">
+        <div class="tile">
+            <h3>Gestión de Clases</h3>
+            <p>Crear, editar y eliminar clases.</p>
+            <a class="btn-primary" th:href="@{/api/clases}">Ver listado (API)</a>
+        </div>
+        <div class="tile">
+            <h3>Reservas</h3>
+            <p>Revisar usuarios registrados en clases.</p>
+            <a class="btn-primary" th:href="@{/api/admin/reservas}">Ver reservas (API)</a>
+        </div>
+    </div>
+    <div class="actions" style="margin-top:16px;">
+        <a class="btn-primary" th:href="@{/logout}">Cerrar sesión</a>
+        <a class="btn-secondary" th:href="@{/}">Ir a vista pública</a>
+    </div>
+</div>
+</body>
+</html>

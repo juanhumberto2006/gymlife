@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel Admin | GymLife</title>
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+</head>
+<body>
+<div class="login-card">
+    <div class="login-header">Panel de Administración</div>
+    <p>Esta es una vista temporal. Aquí irá el dashboard que compartirás.</p>
+    <div class="actions">
+        <a class="btn-primary" th:href="@{/admin/clases}">Gestionar clases (API)</a>
+        <a class="btn-primary" th:href="@{/logout}">Cerrar sesión</a>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nosotros | GymLife</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+    <style>
+        .page-header { background: #222; padding: 60px 0; text-align: center; color: white; margin-bottom: 40px; }
+        .page-title { font-size: 36px; font-weight: 900; margin: 0; text-transform: uppercase; }
+        .page-subtitle { color: #aaa; margin-top: 10px; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .content-section { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 30px; }
+        .content-title { font-size: 24px; font-weight: 700; margin-bottom: 20px; color: var(--primary); }
+        .content-text { line-height: 1.6; color: #555; margin-bottom: 20px; }
+        .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-top: 40px; }
+        .feature-card { text-align: center; padding: 30px; background: #f9f9f9; border-radius: 10px; transition: 0.3s; }
+        .feature-card:hover { transform: translateY(-5px); background: white; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .feature-icon { font-size: 40px; color: var(--primary); margin-bottom: 20px; }
+        .feature-title { font-weight: 700; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a th:href="@{/}" class="navbar-brand">
+            GymLife
+            <span>Fitness Center</span>
+        </a>
+        <ul class="navbar-menu">
+            <li><a th:href="@{/}">Inicio</a></li>
+            <li><a th:href="@{/clases}">Clases</a></li>
+            <li><a th:href="@{/about}" class="active">Nosotros</a></li>
+            <li><a th:href="@{/info}">Información</a></li>
+            <li th:if="${#authorization.expression('isAuthenticated()')}"><a href="#my-reservations">Mis Reservas</a></li>
+        </ul>
+        <div class="navbar-icons">
+            <a href="#" class="icon-btn"><i class="fas fa-search"></i></a>
+            
+            <div class="user-menu" style="position:relative;display:inline-block;" th:if="${#authorization.expression('isAnonymous()')}">
+                 <a href="#" class="icon-btn" onclick="document.getElementById('auth-dropdown').classList.toggle('show');return false;">
+                    <i class="fas fa-user"></i>
+                 </a>
+                 <div id="auth-dropdown" style="display:none;position:absolute;right:0;top:30px;background:white;box-shadow:0 5px 15px rgba(0,0,0,0.1);border-radius:5px;width:150px;overflow:hidden;z-index:100;">
+                    <a th:href="@{/login}" style="display:block;padding:10px 15px;color:var(--dark);text-decoration:none;font-size:14px;border-bottom:1px solid #eee;">Iniciar Sesión</a>
+                    <a th:href="@{/register}" style="display:block;padding:10px 15px;color:var(--dark);text-decoration:none;font-size:14px;">Registrarse</a>
+                 </div>
+            </div>
+
+            <span th:if="${#authorization.expression('isAuthenticated()')}" style="font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;position:relative;">
+                <a href="#" onclick="var d=document.getElementById('user-logout-dropdown'); d.style.display = d.style.display === 'block' ? 'none' : 'block'; return false;" style="text-decoration:none;color:inherit;display:flex;align-items:center;gap:8px;">
+                    <i class="fas fa-user-circle fa-lg"></i>
+                    <span th:text="${#authentication.name}">User</span>
+                </a>
+                <div id="user-logout-dropdown" style="display:none;position:absolute;right:0;top:30px;background:white;box-shadow:0 5px 15px rgba(0,0,0,0.1);border-radius:5px;width:150px;overflow:hidden;z-index:100;">
+                    <a th:href="@{/logout}" style="display:block;padding:10px 15px;color:var(--dark);text-decoration:none;font-size:14px;">Cerrar sesión</a>
+                </div>
+            </span>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="page-header">
+        <h1 class="page-title">Sobre GymLife</h1>
+        <p class="page-subtitle">Tu camino hacia una vida más saludable comienza aquí</p>
+    </header>
+
+    <div class="container">
+        <div class="content-section">
+            <h2 class="content-title">Quiénes Somos</h2>
+            <p class="content-text">
+                GymLife es un centro de fitness de primer nivel dedicado a ayudarte a alcanzar tus objetivos de salud y bienestar.
+                Fundado en 2020, hemos crecido de un pequeño gimnasio local a una instalación de vanguardia equipada con
+                la última tecnología y atendida por profesionales certificados.
+            </p>
+            <p class="content-text">
+                Nuestra misión es proporcionar un entorno de apoyo y motivación para personas de todos los niveles de condición física.
+                Ya seas un principiante que recién comienza o un atleta experimentado que busca superar sus límites,
+                GymLife tiene algo para ti.
+            </p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <i class="fas fa-dumbbell feature-icon"></i>
+                <h3 class="feature-title">Equipamiento Moderno</h3>
+                <p>Acceso a máquinas de cardio y entrenamiento de fuerza de primer nivel.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-users feature-icon"></i>
+                <h3 class="feature-title">Entrenadores Expertos</h3>
+                <p>Entrenadores personales certificados para guiarte en cada paso del camino.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-heartbeat feature-icon"></i>
+                <h3 class="feature-title">Programas de Bienestar</h3>
+                <p>Enfoque holístico que incluye asesoramiento nutricional y talleres de bienestar.</p>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // Dropdown Logic
+        window.onclick = function(event) {
+            if (!event.target.closest('a[onclick*="user-logout-dropdown"]')) {
+                var d = document.getElementById('user-logout-dropdown');
+                if (d && d.style.display === 'block') d.style.display = 'none';
+            }
+            if (!event.target.closest('.user-menu')) {
+                var d = document.getElementById('auth-dropdown');
+                if (d && d.style.display === 'block') d.style.display = 'none';
+            }
+        }
+        /*]]>*/
+    </script>
+</body>
+</html>

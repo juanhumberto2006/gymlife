@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gym Edge | Fitness Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <a href="#" class="navbar-brand">
+        GymLife
+        <span>Fitness Center</span>
+    </a>
+    <ul class="navbar-menu">
+        <li><a th:href="@{/}">Inicio</a></li>
+        <li><a th:href="@{/clases}">Clases</a></li>
+        <li><a th:href="@{/about}">Nosotros</a></li>
+        <li><a th:href="@{/info}">Información</a></li>
+        <li th:if="${#authorization.expression('isAuthenticated()')}"><a href="#my-reservations">Mis Reservas</a></li>
+    </ul>
+    <div class="navbar-icons">
+        <a href="#" class="icon-btn"><i class="fas fa-search"></i></a>
+        <a href="#" class="icon-btn">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="badge">0</span>
+        </a>
+        
+        <!-- User Icon with Login/Register dropdown or status -->
+        <div class="user-menu" style="position:relative;display:inline-block;" th:if="${#authorization.expression('isAnonymous()')}">
+             <a href="#" class="icon-btn" onclick="document.getElementById('auth-dropdown').classList.toggle('show');return false;">
+                <i class="fas fa-user"></i>
+             </a>
+             <div id="auth-dropdown" style="display:none;position:absolute;right:0;top:30px;background:white;box-shadow:0 5px 15px rgba(0,0,0,0.1);border-radius:5px;width:150px;overflow:hidden;z-index:100;">
+                <a th:href="@{/login}" style="display:block;padding:10px 15px;color:var(--dark);text-decoration:none;font-size:14px;border-bottom:1px solid #eee;">Iniciar Sesión</a>
+                <a th:href="@{/register}" style="display:block;padding:10px 15px;color:var(--dark);text-decoration:none;font-size:14px;">Registrarse</a>
+             </div>
+        </div>
+
+        <span th:if="${#authorization.expression('isAuthenticated()')}" style="font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;position:relative;">
+            <a href="#" onclick="var d=document.getElementById('user-logout-dropdown'); d.style.display = d.style.display === 'block' ? 'none' : 'block'; return false;" style="text-decoration:none;color:inherit;display:flex;align-items:center;gap:8px;">
+                <i class="fas fa-user-circle fa-lg"></i>
+                <span th:text="${#authentication.name}">User</span>
+            </a>
+            <div id="user-logout-dropdown" style="display:none;position:absolute;right:0;top:30px;background:white;box-shadow:0 5px 15px rgba(0,0,0,0.1);border-radius:5px;width:150px;overflow:hidden;z-index:100;">
+                <a th:href="@{/logout}" style="display:block;padding:10px 15px;color:var(--dark);text-decoration:none;font-size:14px;">Cerrar sesión</a>
+            </div>
+        </span>
+    </div>
+</nav>
+
+<script>
+// Close dropdown when clicking outside
+window.onclick = function(event) {
+  // Check for auth-dropdown
+  if (!event.target.matches('.fa-user') && !event.target.matches('.icon-btn')) {
+    var authDropdown = document.getElementById("auth-dropdown");
+    if (authDropdown && authDropdown.style.display === 'block') {
+        authDropdown.style.display = 'none';
+    }
+  }
+  // Check for user-logout-dropdown
+  if (!event.target.closest('a[onclick*="user-logout-dropdown"]')) {
+      var logoutDropdown = document.getElementById("user-logout-dropdown");
+      if (logoutDropdown && logoutDropdown.style.display === 'block') {
+          logoutDropdown.style.display = 'none';
+      }
+  }
+}
+// Toggle helper for auth dropdown (anonymous user)
+var authIcon = document.querySelector('.user-menu .icon-btn');
+if(authIcon) {
+    authIcon.addEventListener('click', function(e) {
+        var d = document.getElementById('auth-dropdown');
+        d.style.display = d.style.display === 'block' ? 'none' : 'block';
+        e.preventDefault();
+    });
+}
+</script>
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <h1 class="hero-title">Construye <span>Tu Cuerpo</span> Fuerte</h1>
+    <p class="hero-subtitle">¿Listo para cambiar tu físico, pero no puedes entrenar en el gimnasio?</p>
+    
+    <div th:if="${#authorization.expression('isAnonymous()')}">
+        <a th:href="@{/register}" class="btn-hero">Únete a nosotros</a>
+    </div>
+    <div th:if="${#authorization.expression('isAuthenticated()')}">
+        <a th:href="@{/clases}" class="btn-hero">Reservar una clase</a>
+    </div>
+</section>
+
+<!-- Messages handled by SweetAlert now -->
+<div th:if="${mensaje}" id="flash-message" th:data-msg="${mensaje}" th:data-type="success" style="display:none;"></div>
+<div th:if="${error}" id="flash-error" th:data-msg="${error}" th:data-type="error" style="display:none;"></div>
+
+<script th:inline="javascript">
+/*<![CDATA[*/
+document.addEventListener('DOMContentLoaded', function() {
+    var msgDiv = document.getElementById('flash-message');
+    var errDiv = document.getElementById('flash-error');
+    
+    if(msgDiv) {
+        Swal.fire({
+            title: 'Success!',
+            text: msgDiv.getAttribute('data-msg'),
+            icon: 'success',
+            confirmButtonColor: '#ff5722'
+        });
+    }
+    if(errDiv) {
+        Swal.fire({
+            title: 'Ooops...',
+            text: errDiv.getAttribute('data-msg'),
+            icon: 'error',
+            confirmButtonColor: '#ff5722'
+        });
+    }
+});
+/*]]>*/
+</script>
+
+<!-- Classes Section -->
+<section id="clases" class="section">
+    <div class="section-title">
+        <h2>Nuestras Clases</h2>
+        <p>Elige el mejor entrenamiento para ti</p>
+    </div>
+    
+    <div class="classes-grid">
+        <div class="class-card" th:each="clase : ${clases}">
+            <div class="class-img">
+                <i class="fas fa-dumbbell fa-3x"></i>
+            </div>
+            <div class="class-body">
+                <h3 class="class-title" th:text="${clase.nombre}">Nombre Clase</h3>
+                <p class="class-meta">
+                    <i class="far fa-clock"></i> <span th:text="${#temporals.format(clase.fechaHora, 'dd MMM HH:mm')}">Fecha</span> | 
+                    <i class="fas fa-users"></i> <span th:text="${clase.capacidad - (reservados[clase.id] ?: 0)}">0</span> cupos
+                </p>
+                <p th:text="${clase.descripcion}">Descripción</p>
+                
+                <form th:action="@{/reservar}" method="post" th:if="${#authorization.expression('isAuthenticated()')}">
+                    <input type="hidden" name="claseId" th:value="${clase.id}"/>
+                    <button type="submit" class="btn-primary" 
+                            th:disabled="${(reservados[clase.id] ?: 0) >= clase.capacidad}"
+                            th:classappend="${(reservados[clase.id] ?: 0) >= clase.capacidad} ? 'btn-disabled' : ''">
+                        <span th:text="${(reservados[clase.id] ?: 0) >= clase.capacidad ? 'Lleno' : 'Reservar'}">Reservar</span>
+                    </button>
+                </form>
+                <a th:href="@{/login}" class="btn-primary" th:if="${#authorization.expression('isAnonymous()')}">Inicia sesión para reservar</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- My Reservations -->
+<section id="my-reservations" class="section" style="background-color:var(--light);" th:if="${not #lists.isEmpty(misReservas)}">
+    <div class="section-title">
+        <h2>Mi Agenda</h2>
+        <p>Tus próximas clases</p>
+    </div>
+    <div class="classes-grid">
+        <div class="class-card" th:each="reserva : ${misReservas}">
+            <div class="class-body" style="border-left: 5px solid var(--primary);">
+                <h3 class="class-title" th:text="${reserva.clase.nombre}">Clase</h3>
+                <p class="class-meta">
+                    <i class="far fa-calendar-check"></i> Reservado para: <strong th:text="${#temporals.format(reserva.clase.fechaHora, 'dd MMM HH:mm')}">Fecha</strong>
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+</body>
+</html>
