@@ -10,5 +10,7 @@ import com.proyecto.GymLife.model.Usuario;
 public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     List<Reserva> findByUsuario(Usuario usuario);
     long countByClaseId(Long claseId);
-    boolean existsByUsuarioIdAndClaseId(Long usuarioId, Long claseId);
+    
+    // CAMBIA ESTA LÍNEA:
+    boolean existsByUsuarioAndClaseId(Usuario usuario, Long claseId);
 }
