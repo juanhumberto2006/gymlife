@@ -8,9 +8,14 @@ import com.proyecto.GymLife.model.Reserva;
 import com.proyecto.GymLife.model.Usuario;
 
 public interface ReservaRepository extends JpaRepository<Reserva, Long> {
+    
     List<Reserva> findByUsuario(Usuario usuario);
+    
     long countByClaseId(Long claseId);
     
-    // CAMBIA ESTA LÍNEA:
+    // Método nuevo (con objeto Usuario)
     boolean existsByUsuarioAndClaseId(Usuario usuario, Long claseId);
+    
+    // Método antiguo (con IDs) - LO NECESITAN LOS CONTROLLERS
+    boolean existsByUsuarioIdAndClaseId(Long usuarioId, Long claseId);
 }
