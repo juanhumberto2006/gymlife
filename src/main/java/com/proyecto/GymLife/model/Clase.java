@@ -16,6 +16,7 @@ public class Clase {
     @Column(nullable = false)
     private Integer capacidad;
     @Column(nullable = false)
+    @Column(name = "fecha_hora", nullable = false)
     private LocalDateTime fechaHora;
 
     public Clase() {}

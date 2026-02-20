@@ -24,7 +24,7 @@ public class Reserva {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "clase_id", nullable = false)
     private Clase clase;
-    @Column(nullable = false)
+    @Column(name = "creada_en", nullable = false)
     private LocalDateTime creadaEn = LocalDateTime.now();
 
     public Reserva() {}
