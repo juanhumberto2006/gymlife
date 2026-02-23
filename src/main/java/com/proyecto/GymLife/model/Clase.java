@@ -15,7 +15,6 @@ public class Clase {
     private String descripcion;
     @Column(nullable = false)
     private Integer capacidad;
-    @Column(nullable = false)
     @Column(name = "fecha_hora", nullable = false)
     private LocalDateTime fechaHora;
 
