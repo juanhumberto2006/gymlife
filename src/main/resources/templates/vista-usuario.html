@@ -1,35 +1,60 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GymLife | Usuario</title>
     <link rel="stylesheet" th:href="@{/css/login.css}">
     <style>
-        .hero { text-align: center; color: #fff; margin-bottom: 20px; }
-        .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,.15); width: 420px; }
-        .row { display: flex; justify-content: center; }
-        .btn-secondary { background:#0c3a5f; color:#fff; padding:10px 16px; border-radius:6px; text-decoration:none; }
+        .hero {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+        
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .15);
+            width: 420px;
+        }
+        
+        .row {
+            display: flex;
+            justify-content: center;
+        }
+        
+        .btn-secondary {
+            background: #0c3a5f;
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+        }
     </style>
 </head>
+
 <body>
-<div class="hero">
-    <h1>Bienvenido a GymLife</h1>
-    <p>Reserva tus clases y mantén tu estado físico al día.</p>
-</div>
-<div class="row">
-    <div class="card">
-        <div class="actions" th:if="${#authorization.expression('isAnonymous()')}">
-            <a class="btn-primary" th:href="@{/login}">Iniciar sesión</a>
-        </div>
-        <div th:if="${#authorization.expression('isAuthenticated()')}">
-            <p>Sesión iniciada como <strong th:text="${#authentication.name}"></strong></p>
-            <div class="actions">
-                <a class="btn-primary" th:href="@{/api/clases}">Ver clases</a>
-                <a class="btn-secondary" th:href="@{/logout}">Cerrar sesión</a>
+    <div class="hero">
+        <h1>Bienvenido a GymLife</h1>
+        <p>Reserva tus clases y mantén tu estado físico al día.</p>
+    </div>
+    <div class="row">
+        <div class="card">
+            <div class="actions" th:if="${#authorization.expression('isAnonymous()')}">
+                <a class="btn-primary" th:href="@{/login}">Iniciar sesión</a>
+            </div>
+            <div th:if="${#authorization.expression('isAuthenticated()')}">
+                <p>Sesión iniciada como <strong th:text="${#authentication.name}"></strong></p>
+                <div class="actions">
+                    <a class="btn-primary" th:href="@{/api/clases}">Ver clases</a>
+                    <a class="btn-secondary" th:href="@{/logout}">Cerrar sesión</a>
+                </div>
             </div>
         </div>
     </div>
-</div>
 </body>
+
 </html>
