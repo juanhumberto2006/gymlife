@@ -1,0 +1,334 @@
+================================================================================
+                    ESTRUCTURA COMPLETA DE LA BASE DE DATOS
+                         Sistema GymLife - PostgreSQL
+================================================================================
+
+FECHA: 2026-04-29
+PROYECTO: GymLife - Sistema de Gestión de Gimnasio
+MOTOR: PostgreSQL
+ENTORNO: Spring Boot + JPA/Hibernate
+
+================================================================================
+1. DIAGRAMA DE RELACIONES
+================================================================================
+
+┌─────────────┐       ┌─────────────┐       ┌─────────────┐
+│   usuarios  │1───∞──│    roles    │       │   clases    │
+└─────────────┘       └─────────────┘       └─────────────┘
+       │                                            │
+       │1                                            │1
+       │                                            │
+       ▼                                            ▼
+┌─────────────┐       ┌─────────────┐
+│   reservas  │∞───1──│   clases    │
+└─────────────┘       └─────────────┘
+
+Leyenda:
+1 = Uno
+∞ = Muchos
+
+Relaciones:
+- Usuario (1) → (N) Roles: Un usuario puede tener múltiples roles
+- Usuario (1) → (N) Reservas: Un usuario puede hacer muchas reservas
+- Clase (1) → (N) Reservas: Una clase puede tener muchas reservas
+- Rol (N) → (1) Usuario: Un rol pertenece a un usuario
+- Reserva (N) → (1) Usuario: Una reserva pertenece a un usuario
+- Reserva (N) → (1) Clase: Una reserva pertenece a una clase
+
+================================================================================
+2. DICCIONARIO DE TABLAS
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ TABLA: usuarios                                                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Descripción: Almacena la información de usuarios del sistema               │
+│ Nombre físico: usuarios                                                    │
+│ Entidad Java: Usuario.java                                                  │
+│                                                                             │
+│ Columnas:                                                                   │
+│   id              BIGSERIAL (PK)    - Identificador único                  │
+│   username        VARCHAR(100)      - Nombre de usuario (único)            │
+│   password        VARCHAR(255)      - Contraseña encriptada               │
+│   created_at      TIMESTAMP         - Fecha de creación (auto)            │
+│   updated_at      TIMESTAMP         - Fecha de última actualización       │
+│                                                                             │
+│ Constraints:                                                                │
+│   - PRIMARY KEY (id)                                                        │
+│   - UNIQUE (username)                                                       │
+│   - NOT NULL (username, password)                                           │
+│                                                                             │
+│ Relaciones:                                                                 │
+│   - OneToMany con roles (mappedBy: usuario)                                │
+│   - OneToMany con reservas (mappedBy: usuario)                             │
+│                                                                             │
+│ Índices:                                                                    │
+│   - idx_usuarios_username (username)                                       │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ TABLA: roles                                                                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Descripción: Roles de usuario (ej: ADMIN, USER, MODERATOR)                 │
+│ Nombre físico: roles                                                        │
+│ Entidad Java: Rol.java                                                      │
+│                                                                             │
+│ Columnas:                                                                   │
+│   id              BIGSERIAL (PK)    - Identificador único                  │
+│   rol             VARCHAR(50)       - Nombre del rol                       │
+│   usuario_id      BIGINT            - FK al usuario                        │
+│   created_at      TIMESTAMP         - Fecha de creación (auto)            │
+│                                                                             │
+│ Constraints:                                                                │
+│   - PRIMARY KEY (id)                                                        │
+│   - FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE     │
+│   - NOT NULL (rol, usuario_id)                                              │
+│                                                                             │
+│ Relaciones:                                                                 │
+│   - ManyToOne con usuario (joinColumn: usuario_id)                         │
+│                                                                             │
+│ Índices:                                                                    │
+│   - idx_roles_usuario_id (usuario_id)                                      │
+│   - idx_roles_rol (rol)                                                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ TABLA: clases                                                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Descripción: Clases o sesiones fitness del gimnasio                        │
+│ Nombre físico: clases                                                       │
+│ Entidad Java: Clase.java                                                    │
+│                                                                             │
+│ Columnas:                                                                   │
+│   id              BIGSERIAL (PK)    - Identificador único                  │
+│   nombre          VARCHAR(200)      - Nombre de la clase                   │
+│   descripcion     TEXT              - Descripción detallada               │
+│   capacidad       INTEGER           - Capacidad máxima (debe ser > 0)     │
+│   fecha_hora      TIMESTAMP         - Fecha y hora de la clase            │
+│   created_at      TIMESTAMP         - Fecha de creación (auto)            │
+│   updated_at      TIMESTAMP         - Fecha de última actualización       │
+│                                                                             │
+│ Constraints:                                                                │
+│   - PRIMARY KEY (id)                                                        │
+│   - NOT NULL (nombre, descripcion, capacidad, fecha_hora)                  │
+│   - CHECK (capacidad > 0)                                                   │
+│                                                                             │
+│ Relaciones:                                                                 │
+│   - OneToMany con reservas (mappedBy: clase)                               │
+│                                                                             │
+│ Índices:                                                                    │
+│   - idx_clases_fecha_hora (fecha_hora)                                     │
+│   - idx_clases_nombre (nombre)                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ TABLA: reservas                                                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Descripción: Reservas de clases realizadas por usuarios                    │
+│ Nombre físico: reservas                                                     │
+│ Entidad Java: Reserva.java                                                  │
+│                                                                             │
+│ Columnas:                                                                   │
+│   id              BIGSERIAL (PK)    - Identificador único                  │
+│   usuario_id      BIGINT            - FK al usuario que reserva           │
+│   clase_id        BIGINT            - FK a la clase reservada             │
+│   creada_en       TIMESTAMP         - Fecha/hora de la reserva            │
+│                                                                             │
+│ Constraints:                                                                │
+│   - PRIMARY KEY (id)                                                        │
+│   - FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE     │
+│   - FOREIGN KEY (clase_id) REFERENCES clases(id) ON DELETE CASCADE         │
+│   - UNIQUE (usuario_id, clase_id) - Evita reservas duplicadas             │
+│   - NOT NULL (usuario_id, clase_id, creada_en)                             │
+│                                                                             │
+│ Relaciones:                                                                 │
+│   - ManyToOne con usuario (joinColumn: usuario_id)                         │
+│   - ManyToOne con clase (joinColumn: clase_id)                             │
+│                                                                             │
+│ Índices:                                                                    │
+│   - idx_reservas_usuario_id (usuario_id)                                   │
+│   - idx_reservas_clase_id (clase_id)                                       │
+│   - idx_reservas_creada_en (creada_en)                                     │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+3. ESTRUCTURA FÍSICA DE TABLAS (DDL)
+================================================================================
+
+-- Tabla: usuarios
+CREATE TABLE usuarios (
+    id BIGSERIAL PRIMARY KEY,
+    username VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Tabla: roles
+CREATE TABLE roles (
+    id BIGSERIAL PRIMARY KEY,
+    rol VARCHAR(50) NOT NULL,
+    usuario_id BIGINT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+-- Tabla: clases
+CREATE TABLE clases (
+    id BIGSERIAL PRIMARY KEY,
+    nombre VARCHAR(200) NOT NULL,
+    descripcion TEXT NOT NULL,
+    capacidad INTEGER NOT NULL CHECK (capacidad > 0),
+    fecha_hora TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Tabla: reservas
+CREATE TABLE reservas (
+    id BIGSERIAL PRIMARY KEY,
+    usuario_id BIGINT NOT NULL,
+    clase_id BIGINT NOT NULL,
+    creada_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+    FOREIGN KEY (clase_id) REFERENCES clases(id) ON DELETE CASCADE,
+    CONSTRAINT uk_reserva_usuario_clase UNIQUE (usuario_id, clase_id)
+);
+
+================================================================================
+4. CONFIGURACIÓN JPA/HIBERNATE
+================================================================================
+
+Archivo: src/main/resources/application.properties
+
+Configuración relevante:
+- spring.jpa.hibernate.ddl-auto=none  (DDL gestionado manualmente)
+- spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+
+Estrategia de generación:
+- Las tablas se crean manualmente ejecutando el script SQL
+- Hibernate solo valida el esquema (o no hace nada con ddl-auto=none)
+- Los scripts de migración deberían usarse en producción
+
+================================================================================
+5. EJEMPLOS DE CONSULTAS FRECUENTES
+================================================================================
+
+-- 5.1 Obtener usuario por username con sus roles
+SELECT u.id, u.username, u.created_at,
+       ARRAY_AGG(r.rol) as roles
+FROM usuarios u
+LEFT JOIN roles r ON r.usuario_id = u.id
+WHERE u.username = 'admin'
+GROUP BY u.id;
+
+-- 5.2 Listar todas las clases con conteo de reservas
+SELECT c.id, c.nombre, c.descripcion, c.capacidad,
+       c.fecha_hora,
+       COUNT(r.id) as reservas_actuales,
+       (c.capacidad - COUNT(r.id)) as cupos_disponibles
+FROM clases c
+LEFT JOIN reservas r ON r.clase_id = c.id
+GROUP BY c.id
+ORDER BY c.fecha_hora ASC;
+
+-- 5.3 Obtener reservas de un usuario específico
+SELECT r.id, c.nombre as clase_nombre,
+       c.fecha_hora, c.descripcion, c.capacidad,
+       r.creada_en as fecha_reserva
+FROM reservas r
+JOIN clases c ON r.clase_id = c.id
+WHERE r.usuario_id = ?
+ORDER BY c.fecha_hora ASC;
+
+-- 5.4 Verificar si un usuario ya reservó una clase
+SELECT EXISTS (
+    SELECT 1 FROM reservas
+    WHERE usuario_id = ? AND clase_id = ?
+) as ya_reservado;
+
+-- 5.5 Obtener usuarios con rol ADMIN
+SELECT u.id, u.username
+FROM usuarios u
+JOIN roles r ON r.usuario_id = u.id
+WHERE r.rol = 'ADMIN';
+
+-- 5.6 Clases próximas (próximas 24 horas)
+SELECT id, nombre, fecha_hora, capacidad
+FROM clases
+WHERE fecha_hora BETWEEN NOW() AND NOW() + INTERVAL '24 hours'
+ORDER BY fecha_hora ASC;
+
+-- 5.7 Eliminar reserva (propagación en cascada verificada)
+DELETE FROM reservas WHERE id = ?;
+
+================================================================================
+6. CONSIDERACIONES DE SEGURIDAD
+================================================================================
+
+1. Contraseñas:
+   - En producción, las contraseñas DEBEN estar hasheadas (BCrypt recomendado)
+   - El scriptincluye placeholders para contraseñas hasheadas
+
+2. JWT Secret:
+   - Configurado en application.properties como variable de entorno
+   - Nunca hardcodear en el SQL
+
+3. Acceso a datos:
+   - Usar prepared statements para evitar SQL injection
+   - Validar permisos por rol en la capa de servicio
+
+4. Pool de conexiones (Supabase/PostgreSQL):
+   - maximum-pool-size=2 (limitado por Supabase gratis)
+   - En producción ajustar según necesidades
+
+================================================================================
+7. MIGRACIONES Y VERSIONADO
+================================================================================
+
+Estrategia recomendada:
+1. Usar Flyway o Liquibase para migraciones en producción
+2. Nombrar scripts: V1__creacion_tablas.sql, V2__agregar_indices.sql
+3. Mantener este script como referencia inicial
+4. NO modificar tablas en producción sin migración controlada
+
+Ejemplo de migración con Flyway:
+   V1__creacion_tablas.sql        → Este archivo
+   V2__agregar_columna_edad.sql   → Nuevas versiones
+
+En caso de cambios:
+   - Agregar columnas: ALTER TABLE ... ADD COLUMN ...
+   - Crear índices: CREATE INDEX ...
+   - NO eliminar columnas sin validación
+
+================================================================================
+8. BACKUP Y RESTAURACIÓN
+================================================================================
+
+-- Backup completo (psql):
+--   pg_dump -U usuario -h host -d gymlife > backup.sql
+
+-- Restaurar:
+--   psql -U usuario -h host -d gymlife < backup.sql
+
+-- Solo estructura:
+--   pg_dump -U usuario -h host -d gymlife --schema-only > estructura.sql
+
+-- Solo datos:
+--   pg_dump -U usuario -h host -d gymlife --data-only > datos.sql
+
+================================================================================
+9. NOTAS ADICIONALES
+================================================================================
+
+• Todas las tablas tienen created_at para auditoría
+• updated_at se actualiza automáticamente via trigger
+• ON DELETE CASCADE asegura limpieza automática de datos huérfanos
+• UK (usuario_id, clase_id) evita reservas duplicadas
+• Use CHECK para validar capacidad > 0
+• Los índices mejoran performance en búsquedas frecuentes
+• PostgreSQL autovacuum debe estar habilitado en producción
+
+================================================================================
+FIN DEL DOCUMENTO
+================================================================================
