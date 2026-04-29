@@ -56,7 +56,7 @@ public class UserViewController {
             model.addAttribute("reservados", Map.of());
             model.addAttribute("dbError", "Servicio de base de datos no disponible. Mostrando vista básica.");
         }
-        return "vista usuario/index";
+        return "vista_usuario/index";
     }
 
     @GetMapping("/clases")
@@ -89,17 +89,17 @@ public class UserViewController {
             model.addAttribute("dbError", "Servicio de base de datos no disponible. Mostrando vista básica.");
         }
 
-        return "vista usuario/clases";
+        return "vista_usuario/clases";
     }
 
     @GetMapping("/about")
     public String about() {
-        return "vista usuario/about";
+        return "vista_usuario/about";
     }
 
     @GetMapping("/info")
     public String info() {
-        return "vista usuario/info";
+        return "vista_usuario/info";
     }
 
     @PostMapping("/reservar")
