@@ -119,8 +119,8 @@ INSERT INTO usuarios (username, password) VALUES
 
 -- Insertar roles para los usuarios
 INSERT INTO roles (rol, usuario_id) VALUES
-('ADMIN', 1),
-('USER', 2);
+('ROLE_ADMIN', 1),
+('ROLE_USER', 2);
 
 -- Insertar algunas clases de ejemplo
 INSERT INTO clases (nombre, descripcion, capacidad, fecha_hora) VALUES
